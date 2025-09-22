@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature Converter</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        // Custom Tailwind CSS configuration to extend theme for dark mode
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Basic styling for smooth transitions and a clean look */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .theme-icon {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200 font-sans transition-colors duration-300">
+
+    <!-- Main Application Container -->
+    <div class="min-h-screen flex items-center justify-center p-4">
+        
+        <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8 space-y-6 relative">
+            
+            <!-- Theme Switcher Button -->
+            <button id="theme-toggle" class="absolute top-6 right-6 p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-all duration-300">
+                <svg id="theme-icon-sun" class="h-6 w-6 theme-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <svg id="theme-icon-moon" class="h-6 w-6 theme-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                </svg>
+            </button>
+
+            <!-- Header Section -->
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Temperature Converter</h1>
+                <p class="text-gray-500 dark:text-gray-400 mt-2">Quickly convert temperatures</p>
+            </div>
+
+            <!-- Conversion Type Selector -->
+            <div>
+                <label for="conversionType" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Conversion Type</label>
+                <select id="conversionType" name="conversionType" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition">
+                    <option value="c-to-f">Celsius to Fahrenheit</option>
+                    <option value="f-to-c">Fahrenheit to Celsius</option>
+                </select>
+            </div>
+
+            <!-- Temperature Input -->
+            <div>
+                <label for="temperatureInput" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Enter Temperature</label>
+                <input type="number" id="temperatureInput" placeholder="e.g., 25" class="w-full px-4 py-3 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition">
+            </div>
+
+            <!-- Convert Button -->
+            <button id="convertBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-transform transform hover:scale-105 duration-300">
+                Convert
+            </button>
+
+            <!-- Result Display -->
+            <div id="result" class="text-center text-xl font-semibold pt-4 min-h-[3rem]">
+                <!-- Result will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM element references
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('theme-icon-sun');
+        const moonIcon = document.getElementById('theme-icon-moon');
+        const convertBtn = document.getElementById('convertBtn');
+        const conversionTypeSelect = document.getElementById('conversionType');
+        const temperatureInput = document.getElementById('temperatureInput');
+        const resultDiv = document.getElementById('result');
+
+        // --- Theme Switcher Logic ---
+        // Function to apply theme based on saved preference or system setting
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            }
+        };
+        
+        // Check for saved theme in localStorage
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            applyTheme(savedTheme);
+        }
+
+        // Event listener for the theme toggle button
+        themeToggle.addEventListener('click', () => {
+            const isDarkMode = document.documentElement.classList.toggle('dark');
+            const newTheme = isDarkMode ? 'dark' : 'light';
+            applyTheme(newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // --- Conversion Logic ---
+        function convertTemperature() {
+            const conversionType = conversionTypeSelect.value;
+            const tempValue = parseFloat(temperatureInput.value);
+
+            // Check for invalid input
+            if (isNaN(tempValue)) {
+                resultDiv.textContent = 'Please enter a valid number.';
+                resultDiv.classList.add('text-red-500');
+                return;
+            }
+
+            resultDiv.classList.remove('text-red-500');
+            let convertedTemp;
+            let resultText;
+
+            if (conversionType === 'c-to-f') {
+                // Celsius to Fahrenheit
+                convertedTemp = (tempValue * 9/5) + 32;
+                resultText = `${tempValue.toFixed(1)} °C = ${convertedTemp.toFixed(1)} °F`;
+            } else if (conversionType === 'f-to-c') {
+                // Fahrenheit to Celsius
+                convertedTemp = (tempValue - 32) * 5/9;
+                resultText = `${tempValue.toFixed(1)} °F = ${convertedTemp.toFixed(1)} °C`;
+            }
+            
+            resultDiv.textContent = resultText;
+        }
+
+        // --- Event Listeners ---
+        // Convert when the button is clicked
+        convertBtn.addEventListener('click', convertTemperature);
+        
+        // Also allow converting by pressing 'Enter' in the input field
+        temperatureInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                convertTemperature();
+            }
+        });
+
+    </script>
+
+</body>
+</html>
